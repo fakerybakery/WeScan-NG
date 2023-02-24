@@ -51,6 +51,7 @@ public class ImageScannerResults: NSObject {
         }
         
         scannedImage = uiImage
+        completion?()
     }
     
 }
