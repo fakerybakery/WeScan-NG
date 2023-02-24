@@ -33,9 +33,14 @@ public final class ScannerViewController: UIViewController {
     private lazy var shutterButton: ShutterButton = {
         let button = ShutterButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(captureImage(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(pushGalleryViewController(_:)), for: .touchUpInside)
+
         return button
     }()
+    @objc private func pushGalleryViewController(_ sender: UIButton) {
+        let galleryViewController = ScanGalleryViewController(with: results)
+        navigationController?.pushViewController(galleryViewController, animated: true)
+    }
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
