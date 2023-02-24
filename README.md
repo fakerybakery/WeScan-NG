@@ -1,4 +1,4 @@
-# WeScan
+# WeScan-NG
 
 <p align="center">
     <img width="900px" src="Assets/WeScan-Banner.jpg">
@@ -31,7 +31,7 @@ It's modelled after `UIImagePickerController`, which makes it a breeze to use.
 - [x] Auto scan and flash support
 - [x] Support for both PDF and UIImage
 - [x] Translated to English, Chinese, Italian, Portuguese, and French
-- [ ] Batch scanning
+- [x] Batch scanning
 
 ## Demo
 
