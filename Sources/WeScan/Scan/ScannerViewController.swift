@@ -15,7 +15,9 @@ public final class ScannerViewController: UIViewController {
 
     private var captureSessionManager: CaptureSessionManager?
     private let videoPreviewLayer = AVCaptureVideoPreviewLayer()
-
+    private var results = [ImageScannerResults]()
+    private let scanOperationQueue = OperationQueue()
+    
     /// The view that shows the focus rectangle (when the user taps to focus, similar to the Camera app)
     private var focusRectangle: FocusRectangleView!
 
@@ -290,11 +292,30 @@ extension ScannerViewController: RectangleDetectionDelegateProtocol {
 
     func captureSessionManager(_ captureSessionManager: CaptureSessionManager, didCapturePicture picture: UIImage, withQuad quad: Quadrilateral?) {
         activityIndicator.stopAnimating()
-
-        let editVC = EditScanViewController(image: picture, quad: quad)
-        navigationController?.pushViewController(editVC, animated: false)
-
         shutterButton.isUserInteractionEnabled = true
+        
+        scansButton.alpha = 1.0
+        scansButton.setImage(picture, for: .normal)
+
+        let quad = quad ?? Quadrilateral.defaultQuad(forImage: picture)
+
+        let result = ImageScannerResults(originalImage: picture, detectedRectangle: quad)
+        DispatchQueue.global(qos: .background).async {
+            do {
+                try result.generateScannedImage()
+            } catch {
+                guard let imageScannerController = self.navigationController as? ImageScannerController else {
+                    return
+                }
+                DispatchQueue.main.async {
+                    imageScannerController.imageScannerDelegate?.imageScannerController(imageScannerController, didFailWithError: error)
+                }
+            }
+        }
+        results.append(result)
+
+        let scanOperation = ScanOperation(withResults: result)
+        scanOperationQueue.addOperation(scanOperation)
     }
 
     func captureSessionManager(_ captureSessionManager: CaptureSessionManager, didDetectQuad quad: Quadrilateral?, _ imageSize: CGSize) {
