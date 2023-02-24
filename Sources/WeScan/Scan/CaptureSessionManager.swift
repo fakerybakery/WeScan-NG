@@ -312,7 +312,7 @@ extension CaptureSessionManager: AVCapturePhotoCaptureDelegate {
     private func completeImageCapture(with imageData: Data) {
         DispatchQueue.global(qos: .background).async { [weak self] in
             CaptureSession.current.isEditing = true
-            guard let image = UIImage(data: imageData) else {
+            guard let image = UIImage(data: imageData)?.applyingPortraitOrientation() else {
                 let error = ImageScannerControllerError.capture
                 DispatchQueue.main.async {
                     guard let self else {
@@ -323,19 +323,11 @@ extension CaptureSessionManager: AVCapturePhotoCaptureDelegate {
                 return
             }
 
-            var angle: CGFloat = 0.0
-
-            switch image.imageOrientation {
-            case .right:
-                angle = CGFloat.pi / 2
-            case .up:
-                angle = CGFloat.pi
-            default:
-                break
-            }
+            
 
             var quad: Quadrilateral?
             if let displayedRectangleResult = self?.displayedRectangleResult {
+                let angle: CGFloat = CGFloat.pi / 2
                 quad = self?.displayRectangleResult(rectangleResult: displayedRectangleResult)
                 quad = quad?.scale(displayedRectangleResult.imageSize, image.size, withRotationAngle: angle)
             }
